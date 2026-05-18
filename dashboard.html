@@ -1,0 +1,250 @@
+<Html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<Title> CMS Dashboard - IDEA Company </Title>
+<link rel="icon" type="image/png" href="Project Phtots/ICON.png">
+<link rel="stylesheet" href="style.css?v=1.2">
+<script src="projects.js"></script>
+<script src="script.js"></script>
+</head>
+<body>
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- Toast Notifications -->
+<div id="toast-container"></div>
+
+<div class="header">
+     IDEA Company Dashboard
+</div>
+
+<!-- Login Section -->
+<div id="login-section" class="login-wrapper">
+    <div class="login-glow"></div>
+    <div class="login-card fade-in">
+        <h2 style="margin-bottom: 30px;"> Agency Login </h2>
+        <div style="text-align: left;">
+            <label> Username </label>
+            <input type="text" id="username" placeholder="admin">
+            <label> Password </label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button onclick="handleLogin()" class="btn-outline" style="width: 100%; margin-top: 10px;"> Login </button>
+        <p id="login-error" class="error-msg"> Invalid username or password! </p>
+    </div>
+</div>
+
+<!-- Dashboard Content (Protected) -->
+<div id="dashboard-content">
+    <div class="navigation-left" style="position: sticky; top: 0; z-index: 1000;">
+        <a href="index.html" class="btn-outline"> Back to Website </a>
+        <button onclick="handleLogout()" class="btn-secondary" style="border-color: #ef4444; color: #ef4444;"> Logout </button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    </div>
+
+    <div class="dashboard-container reveal">
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" id="stat-count">0</span>
+                <span class="stat-label">Total Projects</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="stat-last" style="font-size: 14px;">None</span>
+                <span class="stat-label">Last Added</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="stat-theme" style="font-size: 14px;">Dark</span>
+                <span class="stat-label">Active Theme</span>
+            </div>
+        </div>
+
+        <h3> Add New Project </h3>
+        <div class="project-form">
+            <div>
+                <label> Project Title </label>
+                <input type="text" id="p-title" placeholder="e.g. Modern Logo">
+            </div>
+            <div>
+                <label> Upload Image </label>
+                <input type="file" id="p-image-file" accept="image/*" onchange="previewImage(event)">
+                <div id="image-preview-container"></div>
+            </div>
+            <div>
+                <label> Description </label>
+                <input type="text" id="p-desc" placeholder="Brief description of the project">
+            </div>
+            <div>
+                <label> Link Page (Optional) </label>
+                <input type="text" id="p-link" placeholder="Job fair 1.Html">
+            </div>
+            <button onclick="addProject()" class="btn-outline" style="width: 100%; margin-top: 10px;"> Save Project </button>
+        </div>
+
+        <h3> Current Projects </h3>
+        <div id="dashboard-list">
+            <!-- Projects list will be loaded here -->
+        </div>
+        
+        <button onclick="resetProjects()" class="btn-secondary" style="width: 100%; margin-top: 30px; border-color: #ef4444; color: #ef4444;"> Reset to Default Projects </button>
+    </div>
+</div>
+
+<script>
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "admin123";
+    let selectedImageData = "";
+
+    function checkAuth() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const loginSection = document.getElementById('login-section');
+        const dashboardContent = document.getElementById('dashboard-content');
+
+        if (isLoggedIn === 'true') {
+            loginSection.style.display = 'none';
+            dashboardContent.style.display = 'block';
+            loadDashboard();
+            updateStats();
+        } else {
+            loginSection.style.display = 'block';
+            dashboardContent.style.display = 'none';
+        }
+    }
+
+    function handleLogin() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        const errorMsg = document.getElementById('login-error');
+
+        if (user === ADMIN_USER && pass === ADMIN_PASS) {
+            localStorage.setItem('isLoggedIn', 'true');
+            errorMsg.style.display = 'none';
+            checkAuth();
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('isLoggedIn');
+            checkAuth();
+        }
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedImageData = e.target.result;
+                const container = document.getElementById('image-preview-container');
+                container.innerHTML = `<img src="${selectedImageData}" class="preview-img">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function loadDashboard() {
+        const listContainer = document.getElementById('dashboard-list');
+        let currentProjects = projects;
+        const saved = localStorage.getItem('customProjects');
+        if (saved) {
+            currentProjects = JSON.parse(saved);
+        }
+        
+        listContainer.innerHTML = currentProjects.map((p, index) => `
+            <div class="project-list-item">
+                <span><strong>${p.title}</strong></span>
+                <button class="delete-btn" onclick="deleteProject(${index})"> Delete </button>
+            </div>
+        `).join('');
+    }
+
+    function updateStats() {
+        let currentProjects = projects;
+        const saved = localStorage.getItem('customProjects');
+        if (saved) {
+            currentProjects = JSON.parse(saved);
+        }
+
+        document.getElementById('stat-count').innerText = currentProjects.length;
+        document.getElementById('stat-last').innerText = currentProjects.length > 0 ? currentProjects[currentProjects.length - 1].title : "None";
+        document.getElementById('stat-theme').innerText = document.body.classList.contains('light-theme') ? "Light" : "Dark";
+    }
+
+    function addProject() {
+        const title = document.getElementById('p-title').value;
+        const desc = document.getElementById('p-desc').value;
+        const link = document.getElementById('p-link').value;
+
+        if (!title || !selectedImageData) return showToast('Title and Image are required!', 'error');
+
+        let currentProjects = projects;
+        const saved = localStorage.getItem('customProjects');
+        if (saved) {
+            currentProjects = JSON.parse(saved);
+        }
+
+        const newProject = {
+            id: Date.now(),
+            title,
+            image: selectedImageData,
+            description: desc,
+            link: link || "#"
+        };
+
+        currentProjects.push(newProject);
+        localStorage.setItem('customProjects', JSON.stringify(currentProjects));
+        
+        // Reset form
+        document.getElementById('p-title').value = '';
+        document.getElementById('p-desc').value = '';
+        document.getElementById('p-link').value = '';
+        document.getElementById('p-image-file').value = '';
+        document.getElementById('image-preview-container').innerHTML = '';
+        selectedImageData = "";
+        
+        loadDashboard();
+        updateStats();
+        showToast('Project added successfully!', 'success');
+    }
+
+    function deleteProject(index) {
+        if (!confirm('Are you sure you want to delete this project?')) return;
+        
+        let currentProjects = projects;
+        const saved = localStorage.getItem('customProjects');
+        if (saved) {
+            currentProjects = JSON.parse(saved);
+        }
+
+        currentProjects.splice(index, 1);
+        localStorage.setItem('customProjects', JSON.stringify(currentProjects));
+        loadDashboard();
+        updateStats();
+    }
+
+    function resetProjects() {
+        if (!confirm('This will revert all changes to the original projects. Continue?')) return;
+        localStorage.removeItem('customProjects');
+        loadDashboard();
+        updateStats();
+    }
+
+    window.addEventListener('load', () => {
+        checkAuth();
+    });
+
+    // Listen for theme changes to update stats
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('theme-toggle')) {
+            setTimeout(updateStats, 100);
+        }
+    });
+</script>
+
+</body>
+</Html>

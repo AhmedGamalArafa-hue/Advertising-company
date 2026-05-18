@@ -1,0 +1,110 @@
+<Html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<Title> Request Design - IDEA Company </Title>
+<link rel="icon" type="image/png" href="Project Phtots/ICON.png">
+<link rel="stylesheet" href="style.css?v=1.2">
+<script src="script.js"></script>
+</head>
+<body>
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<div class="navigation-center fade-in">
+    <a href="index.html" class="nav-logo">
+        <img src="Project Phtots/ICON.png" alt="IDEA" class="nav-logo-img">
+    </a>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+	<ul id="nav-menu">
+      <li> <a href="index.html" class="nav-link"> Home </a> </li>
+      <li> <a href="logo-design.html" class="nav-link"> Logo </a> </li>
+      <li> <a href="business-cards.html" class="nav-link"> Business Cards </a> </li>
+      <li> <a href="application-form.html" class="nav-link"> Request </a> </li>
+    </ul>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+</div>
+ 
+<div class="content-center fade-in card-hover reveal">
+    <h2 style="margin-top: 0;"> Project Request Form </h2>
+    <p style="color: var(--text-secondary); margin-bottom: 30px;"> Fill out the form below and we will get back to you with a professional quote. </p>
+    <form id="contact-form" action="https://formspree.io/f/placeholder" method="POST">
+        <div style="text-align: left;">
+            <label> Full Name </label>
+            <input type="text" name="name" required placeholder="Enter your full name">
+            
+            <label> Company Name (Optional) </label>
+            <input type="text" name="company" placeholder="Enter your company name">
+            
+            <label> Project Type </label>
+            <input type="text" name="project" placeholder="e.g. Logo, Business Cards" required>
+            
+            <label> Phone Number </label>
+            <input type="tel" name="phone" placeholder="Enter your 11-digit phone number" maxlength="11" required>
+        </div>
+        <button type="submit" class="btn-outline" style="width: 100%; margin-top: 20px;"> Send Request </button>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('contact-form');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showToast('Sending your request...', 'success');
+            setTimeout(() => {
+                showToast('Request sent successfully! We will contact you soon.', 'success');
+                form.reset();
+            }, 1500);
+        });
+    }
+</script>
+
+
+
+<footer class="footer">
+  <div class="footer-inner">
+    <!-- Left: Brand -->
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo">
+        <img src="Project Phtots/ICON.png" alt="IDEA Logo" class="footer-logo-img">
+        <span class="footer-logo-name">IDEA</span>
+      </a>
+      <p class="footer-tagline">We craft premium visual identities — from logos to business cards.</p>
+      <p class="footer-copy">Copyright &copy; 2024 — IDEA Company</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/ideacompanny?igsh=MTB5cTJnNDBtMDUwZQ==" target="_blank" aria-label="Instagram">
+          <img src="Poject icons/instagram.png" alt="Instagram">
+        </a>
+        <a href="https://www.facebook.com/IDEACompanny?mibextid=ZbWKwL" target="_blank" aria-label="Facebook">
+          <img src="Poject icons/facebook.png" alt="Facebook">
+        </a>
+      </div>
+    </div>
+
+    <!-- Middle: About Links -->
+    <div class="footer-nav-col">
+      <p class="footer-nav-heading">About</p>
+      <a href="index.html">Home</a>
+      <a href="logo-design.html">Logo Design</a>
+      <a href="business-cards.html">Business Cards</a>
+    </div>
+
+    <!-- Right: Resources Links -->
+    <div class="footer-nav-col">
+      <p class="footer-nav-heading">Resources</p>
+      <a href="application-form.html">Request a Design</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</Html>
